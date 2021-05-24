@@ -167,7 +167,7 @@ type Request struct {
 	//	*Request_Info
 	//	*Request_InitChain
 	//	*Request_Query
-	//	*Request_BeginBlock
+	//	*Request_FinalizeBlock
 	//	*Request_CheckTx
 	//	*Request_DeliverTx
 	//	*Request_EndBlock
@@ -176,6 +176,12 @@ type Request struct {
 	//	*Request_OfferSnapshot
 	//	*Request_LoadSnapshotChunk
 	//	*Request_ApplySnapshotChunk
+	//	*Request_PrepareProposal
+	//	*Request_VerifyHeader
+	//	*Request_ProcessProposal
+	//	*Request_RevertProposal
+	//	*Request_ExtendVote
+	//	*Request_VerifyVoteExtension
 	Value isRequest_Value `protobuf_oneof:"value"`
 }
 
@@ -233,48 +239,64 @@ type Request_InitChain struct {
 type Request_Query struct {
 	Query *RequestQuery `protobuf:"bytes,5,opt,name=query,proto3,oneof" json:"query,omitempty"`
 }
-type Request_BeginBlock struct {
-	BeginBlock *RequestBeginBlock `protobuf:"bytes,6,opt,name=begin_block,json=beginBlock,proto3,oneof" json:"begin_block,omitempty"`
+type Request_FinalizeBlock struct {
+	FinalizeBlock *RequestFinalizeBlock `protobuf:"bytes,6,opt,name=finalize_block,json=finalizeBlock,proto3,oneof" json:"finalize_block,omitempty"`
 }
 type Request_CheckTx struct {
 	CheckTx *RequestCheckTx `protobuf:"bytes,7,opt,name=check_tx,json=checkTx,proto3,oneof" json:"check_tx,omitempty"`
 }
-type Request_DeliverTx struct {
-	DeliverTx *RequestDeliverTx `protobuf:"bytes,8,opt,name=deliver_tx,json=deliverTx,proto3,oneof" json:"deliver_tx,omitempty"`
-}
-type Request_EndBlock struct {
-	EndBlock *RequestEndBlock `protobuf:"bytes,9,opt,name=end_block,json=endBlock,proto3,oneof" json:"end_block,omitempty"`
-}
 type Request_Commit struct {
-	Commit *RequestCommit `protobuf:"bytes,10,opt,name=commit,proto3,oneof" json:"commit,omitempty"`
+	Commit *RequestCommit `protobuf:"bytes,8,opt,name=commit,proto3,oneof" json:"commit,omitempty"`
 }
 type Request_ListSnapshots struct {
-	ListSnapshots *RequestListSnapshots `protobuf:"bytes,11,opt,name=list_snapshots,json=listSnapshots,proto3,oneof" json:"list_snapshots,omitempty"`
+	ListSnapshots *RequestListSnapshots `protobuf:"bytes,9,opt,name=list_snapshots,json=listSnapshots,proto3,oneof" json:"list_snapshots,omitempty"`
 }
 type Request_OfferSnapshot struct {
-	OfferSnapshot *RequestOfferSnapshot `protobuf:"bytes,12,opt,name=offer_snapshot,json=offerSnapshot,proto3,oneof" json:"offer_snapshot,omitempty"`
+	OfferSnapshot *RequestOfferSnapshot `protobuf:"bytes,10,opt,name=offer_snapshot,json=offerSnapshot,proto3,oneof" json:"offer_snapshot,omitempty"`
 }
 type Request_LoadSnapshotChunk struct {
-	LoadSnapshotChunk *RequestLoadSnapshotChunk `protobuf:"bytes,13,opt,name=load_snapshot_chunk,json=loadSnapshotChunk,proto3,oneof" json:"load_snapshot_chunk,omitempty"`
+	LoadSnapshotChunk *RequestLoadSnapshotChunk `protobuf:"bytes,11,opt,name=load_snapshot_chunk,json=loadSnapshotChunk,proto3,oneof" json:"load_snapshot_chunk,omitempty"`
 }
 type Request_ApplySnapshotChunk struct {
-	ApplySnapshotChunk *RequestApplySnapshotChunk `protobuf:"bytes,14,opt,name=apply_snapshot_chunk,json=applySnapshotChunk,proto3,oneof" json:"apply_snapshot_chunk,omitempty"`
+	ApplySnapshotChunk *RequestApplySnapshotChunk `protobuf:"bytes,12,opt,name=apply_snapshot_chunk,json=applySnapshotChunk,proto3,oneof" json:"apply_snapshot_chunk,omitempty"`
+}
+type Request_PrepareProposal struct {
+	PrepareProposal *RequestPrepareProposal `protobuf:"bytes,13,opt,name=prepare_proposal,json=prepareProposal,proto3,oneof" json:"prepare_proposal,omitempty"`
+}
+type Request_VerifyHeader struct {
+	VerifyHeader *RequestVerifyHeader `protobuf:"bytes,14,opt,name=verify_header,json=verifyHeader,proto3,oneof" json:"verify_header,omitempty"`
+}
+type Request_ProcessProposal struct {
+	ProcessProposal *RequestProcessProposal `protobuf:"bytes,15,opt,name=process_proposal,json=processProposal,proto3,oneof" json:"process_proposal,omitempty"`
+}
+type Request_RevertProposal struct {
+	RevertProposal *RequestRevertProposal `protobuf:"bytes,16,opt,name=revert_proposal,json=revertProposal,proto3,oneof" json:"revert_proposal,omitempty"`
+}
+type Request_ExtendVote struct {
+	ExtendVote *RequestExtendVote `protobuf:"bytes,17,opt,name=extend_vote,json=extendVote,proto3,oneof" json:"extend_vote,omitempty"`
+}
+type Request_VerifyVoteExtension struct {
+	VerifyVoteExtension *RequestVerifyVoteExtension `protobuf:"bytes,18,opt,name=verify_vote_extension,json=verifyVoteExtension,proto3,oneof" json:"verify_vote_extension,omitempty"`
 }
 
-func (*Request_Echo) isRequest_Value()               {}
-func (*Request_Flush) isRequest_Value()              {}
-func (*Request_Info) isRequest_Value()               {}
-func (*Request_InitChain) isRequest_Value()          {}
-func (*Request_Query) isRequest_Value()              {}
-func (*Request_BeginBlock) isRequest_Value()         {}
-func (*Request_CheckTx) isRequest_Value()            {}
-func (*Request_DeliverTx) isRequest_Value()          {}
-func (*Request_EndBlock) isRequest_Value()           {}
-func (*Request_Commit) isRequest_Value()             {}
-func (*Request_ListSnapshots) isRequest_Value()      {}
-func (*Request_OfferSnapshot) isRequest_Value()      {}
-func (*Request_LoadSnapshotChunk) isRequest_Value()  {}
-func (*Request_ApplySnapshotChunk) isRequest_Value() {}
+func (*Request_Echo) isRequest_Value()                {}
+func (*Request_Flush) isRequest_Value()               {}
+func (*Request_Info) isRequest_Value()                {}
+func (*Request_InitChain) isRequest_Value()           {}
+func (*Request_Query) isRequest_Value()               {}
+func (*Request_FinalizeBlock) isRequest_Value()       {}
+func (*Request_CheckTx) isRequest_Value()             {}
+func (*Request_Commit) isRequest_Value()              {}
+func (*Request_ListSnapshots) isRequest_Value()       {}
+func (*Request_OfferSnapshot) isRequest_Value()       {}
+func (*Request_LoadSnapshotChunk) isRequest_Value()   {}
+func (*Request_ApplySnapshotChunk) isRequest_Value()  {}
+func (*Request_VerifyHeader) isRequest_Value() 			  {}
+func (*Request_ProcessProposal) isRequest_Value() 	  {}
+func (*Request_RevertProposal) isRequest_Value() 	    {}
+func (*Request_ExtendVote) isRequest_Value() 				  {}
+func (*Request_VerifyVoteExtension) isRequest_Value() {}
+
 
 func (m *Request) GetValue() isRequest_Value {
 	if m != nil {
@@ -318,9 +340,9 @@ func (m *Request) GetQuery() *RequestQuery {
 	return nil
 }
 
-func (m *Request) GetBeginBlock() *RequestBeginBlock {
-	if x, ok := m.GetValue().(*Request_BeginBlock); ok {
-		return x.BeginBlock
+func (m *Request) GetFinalizeBlock() *RequestFinalizeBlock {
+	if x, ok := m.GetValue().(*Request_FinalizeBlock); ok {
+		return x.FinalizeBlock
 	}
 	return nil
 }
@@ -328,20 +350,6 @@ func (m *Request) GetBeginBlock() *RequestBeginBlock {
 func (m *Request) GetCheckTx() *RequestCheckTx {
 	if x, ok := m.GetValue().(*Request_CheckTx); ok {
 		return x.CheckTx
-	}
-	return nil
-}
-
-func (m *Request) GetDeliverTx() *RequestDeliverTx {
-	if x, ok := m.GetValue().(*Request_DeliverTx); ok {
-		return x.DeliverTx
-	}
-	return nil
-}
-
-func (m *Request) GetEndBlock() *RequestEndBlock {
-	if x, ok := m.GetValue().(*Request_EndBlock); ok {
-		return x.EndBlock
 	}
 	return nil
 }
@@ -389,7 +397,7 @@ func (*Request) XXX_OneofWrappers() []interface{} {
 		(*Request_Info)(nil),
 		(*Request_InitChain)(nil),
 		(*Request_Query)(nil),
-		(*Request_BeginBlock)(nil),
+		(*Request_FinalizeBlock)(nil),
 		(*Request_CheckTx)(nil),
 		(*Request_DeliverTx)(nil),
 		(*Request_EndBlock)(nil),
@@ -701,25 +709,21 @@ func (m *RequestQuery) GetProve() bool {
 	return false
 }
 
-type RequestBeginBlock struct {
-	Hash                []byte         `protobuf:"bytes,1,opt,name=hash,proto3" json:"hash,omitempty"`
-	Header              types1.Header  `protobuf:"bytes,2,opt,name=header,proto3" json:"header"`
-	LastCommitInfo      LastCommitInfo `protobuf:"bytes,3,opt,name=last_commit_info,json=lastCommitInfo,proto3" json:"last_commit_info"`
-	ByzantineValidators []Evidence     `protobuf:"bytes,4,rep,name=byzantine_validators,json=byzantineValidators,proto3" json:"byzantine_validators"`
+type RequestFinalizeBlock struct {
 }
 
-func (m *RequestBeginBlock) Reset()         { *m = RequestBeginBlock{} }
-func (m *RequestBeginBlock) String() string { return proto.CompactTextString(m) }
-func (*RequestBeginBlock) ProtoMessage()    {}
-func (*RequestBeginBlock) Descriptor() ([]byte, []int) {
+func (m *RequestFinalizeBlock) Reset()         { *m = RequestFinalizeBlock{} }
+func (m *RequestFinalizeBlock) String() string { return proto.CompactTextString(m) }
+func (*RequestFinalizeBlock) ProtoMessage()    {}
+func (*RequestFinalizeBlock) Descriptor() ([]byte, []int) {
 	return fileDescriptor_252557cfdd89a31a, []int{6}
 }
-func (m *RequestBeginBlock) XXX_Unmarshal(b []byte) error {
+func (m *RequestFinalizeBlock) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *RequestBeginBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RequestFinalizeBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_RequestBeginBlock.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RequestFinalizeBlock.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -729,45 +733,17 @@ func (m *RequestBeginBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *RequestBeginBlock) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RequestBeginBlock.Merge(m, src)
+func (m *RequestFinalizeBlock) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RequestFinalizeBlock.Merge(m, src)
 }
-func (m *RequestBeginBlock) XXX_Size() int {
+func (m *RequestFinalizeBlock) XXX_Size() int {
 	return m.Size()
 }
-func (m *RequestBeginBlock) XXX_DiscardUnknown() {
-	xxx_messageInfo_RequestBeginBlock.DiscardUnknown(m)
+func (m *RequestFinalizeBlock) XXX_DiscardUnknown() {
+	xxx_messageInfo_RequestFinalizeBlock.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_RequestBeginBlock proto.InternalMessageInfo
-
-func (m *RequestBeginBlock) GetHash() []byte {
-	if m != nil {
-		return m.Hash
-	}
-	return nil
-}
-
-func (m *RequestBeginBlock) GetHeader() types1.Header {
-	if m != nil {
-		return m.Header
-	}
-	return types1.Header{}
-}
-
-func (m *RequestBeginBlock) GetLastCommitInfo() LastCommitInfo {
-	if m != nil {
-		return m.LastCommitInfo
-	}
-	return LastCommitInfo{}
-}
-
-func (m *RequestBeginBlock) GetByzantineValidators() []Evidence {
-	if m != nil {
-		return m.ByzantineValidators
-	}
-	return nil
-}
+var xxx_messageInfo_RequestFinalizeBlock proto.InternalMessageInfo
 
 type RequestCheckTx struct {
 	Tx   []byte      `protobuf:"bytes,1,opt,name=tx,proto3" json:"tx,omitempty"`
@@ -819,94 +795,6 @@ func (m *RequestCheckTx) GetType() CheckTxType {
 		return m.Type
 	}
 	return CheckTxType_New
-}
-
-type RequestDeliverTx struct {
-	Tx []byte `protobuf:"bytes,1,opt,name=tx,proto3" json:"tx,omitempty"`
-}
-
-func (m *RequestDeliverTx) Reset()         { *m = RequestDeliverTx{} }
-func (m *RequestDeliverTx) String() string { return proto.CompactTextString(m) }
-func (*RequestDeliverTx) ProtoMessage()    {}
-func (*RequestDeliverTx) Descriptor() ([]byte, []int) {
-	return fileDescriptor_252557cfdd89a31a, []int{8}
-}
-func (m *RequestDeliverTx) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RequestDeliverTx) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RequestDeliverTx.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RequestDeliverTx) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RequestDeliverTx.Merge(m, src)
-}
-func (m *RequestDeliverTx) XXX_Size() int {
-	return m.Size()
-}
-func (m *RequestDeliverTx) XXX_DiscardUnknown() {
-	xxx_messageInfo_RequestDeliverTx.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RequestDeliverTx proto.InternalMessageInfo
-
-func (m *RequestDeliverTx) GetTx() []byte {
-	if m != nil {
-		return m.Tx
-	}
-	return nil
-}
-
-type RequestEndBlock struct {
-	Height int64 `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
-}
-
-func (m *RequestEndBlock) Reset()         { *m = RequestEndBlock{} }
-func (m *RequestEndBlock) String() string { return proto.CompactTextString(m) }
-func (*RequestEndBlock) ProtoMessage()    {}
-func (*RequestEndBlock) Descriptor() ([]byte, []int) {
-	return fileDescriptor_252557cfdd89a31a, []int{9}
-}
-func (m *RequestEndBlock) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RequestEndBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RequestEndBlock.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RequestEndBlock) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RequestEndBlock.Merge(m, src)
-}
-func (m *RequestEndBlock) XXX_Size() int {
-	return m.Size()
-}
-func (m *RequestEndBlock) XXX_DiscardUnknown() {
-	xxx_messageInfo_RequestEndBlock.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RequestEndBlock proto.InternalMessageInfo
-
-func (m *RequestEndBlock) GetHeight() int64 {
-	if m != nil {
-		return m.Height
-	}
-	return 0
 }
 
 type RequestCommit struct {
@@ -1155,6 +1043,31 @@ func (m *RequestApplySnapshotChunk) GetSender() string {
 		return m.Sender
 	}
 	return ""
+}
+
+type RequestPrepareProposal struct {
+}
+
+type RequestVerifyHeader struct {
+		IsValidator bool `protobuf:"varint,1,opt,name=is_validator,proto3" json:"is_validator,omitempty"`
+}
+
+type RequestProcessProposal struct {
+}
+
+type RequestRevertProposal struct {
+		Height uint64 `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
+		Round uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
+}
+
+type RequestExtendVote struct {
+		Height uint64 `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
+		Round uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
+}
+
+type RequestVerifyVoteExtension struct {
+		SignedAppVoteData []byte `protobuf:"bytes,1,opt,name=signed_app_vote_data,proto3" json:"signed_app_vote_data,omitempty"`
+		SelfAuthenticatingAppVoteData []byte `protobuf:"bytes,2,opt,name=self_authenticating_app_vote_data,proto3" json:"self_authenticating_app_vote_data,omitempty"`
 }
 
 type Response struct {
@@ -2899,7 +2812,7 @@ func init() {
 	proto.RegisterType((*RequestInfo)(nil), "tendermint.abci.RequestInfo")
 	proto.RegisterType((*RequestInitChain)(nil), "tendermint.abci.RequestInitChain")
 	proto.RegisterType((*RequestQuery)(nil), "tendermint.abci.RequestQuery")
-	proto.RegisterType((*RequestBeginBlock)(nil), "tendermint.abci.RequestBeginBlock")
+	proto.RegisterType((*RequestFinalizeBlock)(nil), "tendermint.abci.RequestFinalizeBlock")
 	proto.RegisterType((*RequestCheckTx)(nil), "tendermint.abci.RequestCheckTx")
 	proto.RegisterType((*RequestDeliverTx)(nil), "tendermint.abci.RequestDeliverTx")
 	proto.RegisterType((*RequestEndBlock)(nil), "tendermint.abci.RequestEndBlock")
@@ -3123,7 +3036,7 @@ type ABCIApplicationClient interface {
 	Query(ctx context.Context, in *RequestQuery, opts ...grpc.CallOption) (*ResponseQuery, error)
 	Commit(ctx context.Context, in *RequestCommit, opts ...grpc.CallOption) (*ResponseCommit, error)
 	InitChain(ctx context.Context, in *RequestInitChain, opts ...grpc.CallOption) (*ResponseInitChain, error)
-	BeginBlock(ctx context.Context, in *RequestBeginBlock, opts ...grpc.CallOption) (*ResponseBeginBlock, error)
+	FinalizeBlock(ctx context.Context, in *RequestFinalizeBlock, opts ...grpc.CallOption) (*ResponseFinalizeBlock, error)
 	EndBlock(ctx context.Context, in *RequestEndBlock, opts ...grpc.CallOption) (*ResponseEndBlock, error)
 	ListSnapshots(ctx context.Context, in *RequestListSnapshots, opts ...grpc.CallOption) (*ResponseListSnapshots, error)
 	OfferSnapshot(ctx context.Context, in *RequestOfferSnapshot, opts ...grpc.CallOption) (*ResponseOfferSnapshot, error)
@@ -3211,9 +3124,9 @@ func (c *aBCIApplicationClient) InitChain(ctx context.Context, in *RequestInitCh
 	return out, nil
 }
 
-func (c *aBCIApplicationClient) BeginBlock(ctx context.Context, in *RequestBeginBlock, opts ...grpc.CallOption) (*ResponseBeginBlock, error) {
-	out := new(ResponseBeginBlock)
-	err := c.cc.Invoke(ctx, "/tendermint.abci.ABCIApplication/BeginBlock", in, out, opts...)
+func (c *aBCIApplicationClient) FinalizeBlock(ctx context.Context, in *RequestFinalizeBlock, opts ...grpc.CallOption) (*ResponseFinalizeBlock, error) {
+	out := new(RequestFinalizeBlock)
+	err := c.cc.Invoke(ctx, "/tendermint.abci.ABCIApplication/FinalizeBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3275,7 +3188,7 @@ type ABCIApplicationServer interface {
 	Query(context.Context, *RequestQuery) (*ResponseQuery, error)
 	Commit(context.Context, *RequestCommit) (*ResponseCommit, error)
 	InitChain(context.Context, *RequestInitChain) (*ResponseInitChain, error)
-	BeginBlock(context.Context, *RequestBeginBlock) (*ResponseBeginBlock, error)
+	FinalizeBlock(context.Context, *RequestFinalizeBlock) (*ResponseFinalizeBlock, error)
 	EndBlock(context.Context, *RequestEndBlock) (*ResponseEndBlock, error)
 	ListSnapshots(context.Context, *RequestListSnapshots) (*ResponseListSnapshots, error)
 	OfferSnapshot(context.Context, *RequestOfferSnapshot) (*ResponseOfferSnapshot, error)
@@ -3311,8 +3224,8 @@ func (*UnimplementedABCIApplicationServer) Commit(ctx context.Context, req *Requ
 func (*UnimplementedABCIApplicationServer) InitChain(ctx context.Context, req *RequestInitChain) (*ResponseInitChain, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InitChain not implemented")
 }
-func (*UnimplementedABCIApplicationServer) BeginBlock(ctx context.Context, req *RequestBeginBlock) (*ResponseBeginBlock, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BeginBlock not implemented")
+func (*UnimplementedABCIApplicationServer) FinalizeBlock(ctx context.Context, req *RequestFinalizeBlock) (*ResponseFinalBlock, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinalizeBlock not implemented")
 }
 func (*UnimplementedABCIApplicationServer) EndBlock(ctx context.Context, req *RequestEndBlock) (*ResponseEndBlock, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EndBlock not implemented")
@@ -3623,8 +3536,8 @@ var _ABCIApplication_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ABCIApplication_InitChain_Handler,
 		},
 		{
-			MethodName: "BeginBlock",
-			Handler:    _ABCIApplication_BeginBlock_Handler,
+			MethodName: "FinalizeBlock",
+			Handler:    _ABCIApplication_FinalizeBlock_Handler,
 		},
 		{
 			MethodName: "EndBlock",

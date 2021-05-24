@@ -21,20 +21,24 @@ import "gogoproto/gogo.proto";
 
 message Request {
   oneof value {
-    RequestEcho               echo                 = 1;
-    RequestFlush              flush                = 2;
-    RequestInfo               info                 = 3;
-    RequestInitChain          init_chain           = 4;
-    RequestQuery              query                = 5;
-    RequestBeginBlock         begin_block          = 6;
-    RequestCheckTx            check_tx             = 7;
-    RequestDeliverTx          deliver_tx           = 8;
-    RequestEndBlock           end_block            = 9;
-    RequestCommit             commit               = 10;
-    RequestListSnapshots      list_snapshots       = 11;
-    RequestOfferSnapshot      offer_snapshot       = 12;
-    RequestLoadSnapshotChunk  load_snapshot_chunk  = 13;
-    RequestApplySnapshotChunk apply_snapshot_chunk = 14;
+    RequestEcho                echo                  = 1;
+    RequestFlush               flush                 = 2;
+    RequestInfo                info                  = 3;
+    RequestInitChain           init_chain            = 4;
+    RequestQuery               query                 = 5;
+    RequestFinalizeBlock       finalize_block        = 6;
+    RequestCheckTx             check_tx              = 7;
+    RequestCommit              commit                = 8;
+    RequestListSnapshots       list_snapshots        = 9;
+    RequestOfferSnapshot       offer_snapshot        = 10;
+    RequestLoadSnapshotChunk   load_snapshot_chunk   = 11;
+    RequestApplySnapshotChunk  apply_snapshot_chunk  = 12;
+    RequestPrepareProposal     prepare_proposal      = 13;
+    RequestVerifyHeader        verify_header         = 14;
+    RequestProcessProposal     process_proposal      = 15;
+    RequestRevertProposal      revert_proposal       = 16;
+    RequestExtendVote          extend_vote           = 17;
+    RequestVerifyVoteExtension verify_vote_extension = 18;
   }
 }
 
@@ -67,11 +71,7 @@ message RequestQuery {
   bool   prove  = 4;
 }
 
-message RequestBeginBlock {
-  bytes                   hash                 = 1;
-  tendermint.types.Header header               = 2 [(gogoproto.nullable) = false];
-  LastCommitInfo          last_commit_info     = 3 [(gogoproto.nullable) = false];
-  repeated Evidence       byzantine_validators = 4 [(gogoproto.nullable) = false];
+message RequestFinalizeBlock {
 }
 
 enum CheckTxType {
@@ -82,14 +82,6 @@ enum CheckTxType {
 message RequestCheckTx {
   bytes       tx   = 1;
   CheckTxType type = 2;
-}
-
-message RequestDeliverTx {
-  bytes tx = 1;
-}
-
-message RequestEndBlock {
-  int64 height = 1;
 }
 
 message RequestCommit {}
@@ -117,26 +109,58 @@ message RequestApplySnapshotChunk {
   string sender = 3;
 }
 
+// Prepare proposal
+message RequestPrepareProposal {
+}
+
+// Verify header
+message RequestVerifyHeader {
+  bool is_validator = 1;
+}
+
+// Process proposal
+message RequestProcessProposal {
+}
+
+message RequestRevertProposal {
+  uint64 height = 1;
+  uint64 round  = 2;
+}
+
+message RequestExtendVote {
+  uint64 height = 1;
+  uint64 round  = 2;
+}
+
+message RequestVerifyVoteExtension {
+  bytes signed_app_vote_data              = 1;
+  bytes self_authenticating_app_vote_data = 2;
+}
+
 //----------------------------------------
 // Response types
 
 message Response {
   oneof value {
-    ResponseException          exception            = 1;
-    ResponseEcho               echo                 = 2;
-    ResponseFlush              flush                = 3;
-    ResponseInfo               info                 = 4;
-    ResponseInitChain          init_chain           = 5;
-    ResponseQuery              query                = 6;
-    ResponseBeginBlock         begin_block          = 7;
-    ResponseCheckTx            check_tx             = 8;
-    ResponseDeliverTx          deliver_tx           = 9;
-    ResponseEndBlock           end_block            = 10;
-    ResponseCommit             commit               = 11;
-    ResponseListSnapshots      list_snapshots       = 12;
-    ResponseOfferSnapshot      offer_snapshot       = 13;
-    ResponseLoadSnapshotChunk  load_snapshot_chunk  = 14;
-    ResponseApplySnapshotChunk apply_snapshot_chunk = 15;
+    ResponseException           exception             = 1;
+    ResponseEcho                echo                  = 2;
+    ResponseFlush               flush                 = 3;
+    ResponseInfo                info                  = 4;
+    ResponseInitChain           init_chain            = 5;
+    ResponseQuery               query                 = 6;
+    ResponseFinalizeBlock       finalize_block        = 7;
+    ResponseCheckTx             check_tx              = 8;
+    ResponseCommit              commit                = 9;
+    ResponseListSnapshots       list_snapshots        = 10;
+    ResponseOfferSnapshot       offer_snapshot        = 11;
+    ResponseLoadSnapshotChunk   load_snapshot_chunk   = 12;
+    ResponseApplySnapshotChunk  apply_snapshot_chunk  = 13;
+    ResponsePrepareProposal     prepare_proposal      = 14;
+    ResponseVerifyHeader        verify_header         = 15;
+    ResponseProcessProposal     process_proposal      = 16;
+    ResponseRevertProposal      revert_proposal       = 17;
+    ResponseExtendVote          extend_vote           = 18;
+    ResponseVerifyVoteExtension verify_vote_extension = 19;
   }
 }
 
@@ -181,8 +205,9 @@ message ResponseQuery {
   string                     codespace = 10;
 }
 
-message ResponseBeginBlock {
-  repeated Event events = 1 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "events,omitempty"];
+message ResponseFinalizeBlock {
+  ConsensusUpdates    updates    = 1;
+  repeated ResponseTx tx_results = 2;
 }
 
 message ResponseCheckTx {
@@ -196,7 +221,7 @@ message ResponseCheckTx {
   string         codespace  = 8;
 }
 
-message ResponseDeliverTx {
+message ResponseTx {
   uint32         code       = 1;
   bytes          data       = 2;
   string         log        = 3;  // nondeterministic
@@ -208,7 +233,7 @@ message ResponseDeliverTx {
   string codespace = 8;
 }
 
-message ResponseEndBlock {
+message ConsensusUpdates {
   repeated ValidatorUpdate         validator_updates       = 1 [(gogoproto.nullable) = false];
   tendermint.types.ConsensusParams consensus_param_updates = 2;
   repeated Event                   events = 3 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "events,omitempty"];
@@ -256,6 +281,31 @@ message ResponseApplySnapshotChunk {
   }
 }
 
+message ResponsePrepareProposal {
+}
+
+message ResponseVerifyHeader {
+  bool accept_header = 1;
+  repeated Evidence evidence = 2;
+}
+
+message ResponseProcessProposal {
+  bool accept_block = 1;
+  repeated Evidence evidence = 2;
+}
+
+message ResponseRevertProposal {
+}
+
+message ResponseExtendVote {
+  bytes unsigned_app_vote_data = 1;
+  bytes self_authenticating_app_data = 2;
+}
+
+message ResponseVerifyVoteExtension {
+  bool result = 1;
+}
+
 //----------------------------------------
 // Misc.
 
@@ -286,7 +336,7 @@ message TxResult {
   int64             height = 1;
   uint32            index  = 2;
   bytes             tx     = 3;
-  ResponseDeliverTx result = 4 [(gogoproto.nullable) = false];
+  ResponseTx result = 4 [(gogoproto.nullable) = false];
 }
 
 //----------------------------------------
@@ -349,15 +399,19 @@ service ABCIApplication {
   rpc Echo(RequestEcho) returns (ResponseEcho);
   rpc Flush(RequestFlush) returns (ResponseFlush);
   rpc Info(RequestInfo) returns (ResponseInfo);
-  rpc DeliverTx(RequestDeliverTx) returns (ResponseDeliverTx);
   rpc CheckTx(RequestCheckTx) returns (ResponseCheckTx);
   rpc Query(RequestQuery) returns (ResponseQuery);
   rpc Commit(RequestCommit) returns (ResponseCommit);
   rpc InitChain(RequestInitChain) returns (ResponseInitChain);
-  rpc BeginBlock(RequestBeginBlock) returns (ResponseBeginBlock);
-  rpc EndBlock(RequestEndBlock) returns (ResponseEndBlock);
+  rpc FinalizeBlock(RequestFinalizeBlock) returns (ResponseFinalizeBlock);
   rpc ListSnapshots(RequestListSnapshots) returns (ResponseListSnapshots);
   rpc OfferSnapshot(RequestOfferSnapshot) returns (ResponseOfferSnapshot);
   rpc LoadSnapshotChunk(RequestLoadSnapshotChunk) returns (ResponseLoadSnapshotChunk);
   rpc ApplySnapshotChunk(RequestApplySnapshotChunk) returns (ResponseApplySnapshotChunk);
+  rpc PrepareProposal(RequestPrepareProposal) returns (ResponsePrepareProposal);
+  rpc VerifyHeader(RequestVerifyHeader) returns (ResponseVerifyHeader);
+  rpc ProcessProposal(RequestProcessProposal) returns (ResponseProcessProposal);
+  rpc RevertProposal(RequestRevertProposal) returns (ResponseRevertProposal);
+  rpc ExtendVote(RequestExtendVote) returns (ResponseExtendVote);
+  rpc VerifyVoteExtension(RequestVerifyVoteExtension) returns (ResponseVerifyVoteExtension);
 }

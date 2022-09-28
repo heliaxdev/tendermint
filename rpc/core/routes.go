@@ -34,6 +34,7 @@ var Routes = map[string]*rpc.RPCFunc{
 	"consensus_params":     rpc.NewRPCFunc(ConsensusParams, "height"),
 	"unconfirmed_txs":      rpc.NewRPCFunc(UnconfirmedTxs, "limit"),
 	"num_unconfirmed_txs":  rpc.NewRPCFunc(NumUnconfirmedTxs, ""),
+	"events":               rpc.NewRPCFunc(Events, "query,max_wait_time"),
 
 	// tx broadcast API
 	"broadcast_tx_commit": rpc.NewRPCFunc(BroadcastTxCommit, "tx"),

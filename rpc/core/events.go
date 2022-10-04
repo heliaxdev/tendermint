@@ -54,13 +54,20 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 		_ = env.EventBus.Unsubscribe(context.Background(), addr, q)
 	}()
 
-		select {
+	select {
 	case msg := <-sub.Out():
-		return &ctypes.ResultEvent{Query: query, Data: msg.Data(), Events: msg.Events()}, nil
+		event := &ctypes.ResultEvent{
+			Query:  query,
+			Data:   msg.Data(),
+			Events: msg.Events(),
+		}
+		return event, nil
 	case <-subCtx.Done():
-		return nil, fmt.Errorf("timeout of %s expired", wt)
+		err = fmt.Errorf("timeout of %s expired", wt)
+		return nil, err
 	case <-sub.Cancelled():
-		return nil, fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
+		err = fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
+		return nil, err
 	}
 }
 

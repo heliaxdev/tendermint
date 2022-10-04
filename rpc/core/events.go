@@ -48,7 +48,9 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (event *ctypes.Res
 	if err != nil {
 		return
 	}
-	defer env.EventBus.Unsubscribe(context.Background(), addr, q)
+	defer func() {
+		_ = env.EventBus.Unsubscribe(subCtx, addr, q)
+	}()
 
 	select {
 	case msg := <-sub.Out():

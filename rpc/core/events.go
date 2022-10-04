@@ -49,7 +49,9 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 		return nil, err
 	}
 	defer func() {
-		_ = env.EventBus.Unsubscribe(subCtx, addr, q)
+		// unsubscribing shouldn't take too long. `maxWaitTime` is not a precise
+		// timeout anyway...
+		_ = env.EventBus.Unsubscribe(context.Background(), addr, q)
 	}()
 
 	var event *ctypes.ResultEvent

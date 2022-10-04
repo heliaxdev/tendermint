@@ -54,18 +54,14 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 		_ = env.EventBus.Unsubscribe(context.Background(), addr, q)
 	}()
 
-	var event *ctypes.ResultEvent
-
-	select {
+		select {
 	case msg := <-sub.Out():
-		event = &ctypes.ResultEvent{Query: query, Data: msg.Data(), Events: msg.Events()}
+		return &ctypes.ResultEvent{Query: query, Data: msg.Data(), Events: msg.Events()}, nil
 	case <-subCtx.Done():
-		err = fmt.Errorf("timeout of %s expired", wt)
+		return nil, fmt.Errorf("timeout of %s expired", wt)
 	case <-sub.Cancelled():
-		err = fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
+		return nil, fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
 	}
-
-	return event, err
 }
 
 // Subscribe for events via WebSocket.

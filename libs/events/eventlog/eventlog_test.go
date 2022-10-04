@@ -13,9 +13,9 @@ import (
 	"github.com/fortytw2/leaktest"
 	"github.com/google/go-cmp/cmp"
 
+	tmevents "github.com/tendermint/tendermint/libs/events"
 	"github.com/tendermint/tendermint/libs/events/eventlog"
 	"github.com/tendermint/tendermint/libs/events/eventlog/cursor"
-	"github.com/tendermint/tendermint/types"
 )
 
 // fakeTime is a fake clock to use to control cursor assignment.
@@ -190,7 +190,7 @@ func TestPruneSize(t *testing.T) {
 
 // mustAdd adds a single event to lg. If Add reports an error other than for
 // pruning, the test fails; otherwise the error is returned.
-func mustAdd(t *testing.T, lg *eventlog.Log, etype string, data types.EventData) {
+func mustAdd(t *testing.T, lg *eventlog.Log, etype string, data tmevents.EventData) {
 	t.Helper()
 	err := lg.Add(etype, data)
 	if err != nil && !errors.Is(err, eventlog.ErrLogPruned) {

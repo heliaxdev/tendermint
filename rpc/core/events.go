@@ -18,7 +18,7 @@ const (
 	maxQueryLength = 512
 )
 
-// Poll for new ABCI events.
+// Events polls for new ABCI events that match the `query`
 func Events(ctx *rpctypes.Context, query, maxWaitTime string) (event *ctypes.ResultEvent, err error) {
 	wt, err := time.ParseDuration(maxWaitTime)
 	if err != nil {

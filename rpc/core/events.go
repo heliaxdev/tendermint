@@ -18,6 +18,59 @@ const (
 	maxQueryLength = 512
 )
 
+// Events polls for new ABCI events that match the `query`
+func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEvent, error) {
+	wt, err := time.ParseDuration(maxWaitTime)
+	if err != nil {
+		err = fmt.Errorf("failed to parse maxWaitTime: %w", err)
+		return nil, err
+	}
+
+	q, err := tmquery.New(query)
+	if err != nil {
+		err = fmt.Errorf("failed to parse query: %w", err)
+		return nil, err
+	}
+
+	const timeoutMin = 1 * time.Second
+	const timeoutMax = 30 * time.Second
+	if wt < timeoutMin {
+		wt = timeoutMin
+	} else if wt > timeoutMax {
+		wt = timeoutMax
+	}
+
+	subCtx, cancel := context.WithTimeout(ctx.Context(), wt)
+	defer cancel()
+
+	addr := ctx.RemoteAddr()
+	sub, err := env.EventBus.Subscribe(subCtx, addr, q, env.Config.SubscriptionBufferSize)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		// unsubscribing shouldn't take too long. `maxWaitTime` is not a precise
+		// timeout anyway...
+		_ = env.EventBus.Unsubscribe(context.Background(), addr, q)
+	}()
+
+	select {
+	case msg := <-sub.Out():
+		event := &ctypes.ResultEvent{
+			Query:  query,
+			Data:   msg.Data(),
+			Events: msg.Events(),
+		}
+		return event, nil
+	case <-subCtx.Done():
+		err = fmt.Errorf("timeout of %s expired", wt)
+		return nil, err
+	case <-sub.Cancelled():
+		err = fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
+		return nil, err
+	}
+}
+
 // Subscribe for events via WebSocket.
 // More: https://docs.tendermint.com/v0.37/rpc/#/Websocket/subscribe
 func Subscribe(ctx *rpctypes.Context, query string) (*ctypes.ResultSubscribe, error) {

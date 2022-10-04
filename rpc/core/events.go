@@ -63,7 +63,7 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 		err = fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
 	}
 
-	return event, nil
+	return event, err
 }
 
 // Subscribe for events via WebSocket.

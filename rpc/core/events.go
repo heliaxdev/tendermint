@@ -19,17 +19,17 @@ const (
 )
 
 // Events polls for new ABCI events that match the `query`
-func Events(ctx *rpctypes.Context, query, maxWaitTime string) (event *ctypes.ResultEvent, err error) {
+func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEvent, error) {
 	wt, err := time.ParseDuration(maxWaitTime)
 	if err != nil {
 		err = fmt.Errorf("failed to parse maxWaitTime: %w", err)
-		return
+		return nil, err
 	}
 
 	q, err := tmquery.New(query)
 	if err != nil {
 		err = fmt.Errorf("failed to parse query: %w", err)
-		return
+		return nil, err
 	}
 
 	const timeoutMin = 1 * time.Second
@@ -46,11 +46,13 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (event *ctypes.Res
 	addr := ctx.RemoteAddr()
 	sub, err := env.EventBus.Subscribe(subCtx, addr, q, env.Config.SubscriptionBufferSize)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer func() {
 		_ = env.EventBus.Unsubscribe(subCtx, addr, q)
 	}()
+
+	var event *ctypes.ResultEvent
 
 	select {
 	case msg := <-sub.Out():
@@ -61,7 +63,7 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (event *ctypes.Res
 		err = fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
 	}
 
-	return
+	return event, nil
 }
 
 // Subscribe for events via WebSocket.

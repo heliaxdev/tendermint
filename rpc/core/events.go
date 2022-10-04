@@ -32,12 +32,12 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (event *ctypes.Res
 		return
 	}
 
-	const constMinWaitTime = 1 * time.Second
-	const constMaxWaitTime = 30 * time.Second
-	if wt < constMinWaitTime {
-		wt = constMinWaitTime
-	} else if wt > constMaxWaitTime {
-		wt = constMaxWaitTime
+	const timeoutMin = 1 * time.Second
+	const timeoutMax = 30 * time.Second
+	if wt < timeoutMin {
+		wt = timeoutMin
+	} else if wt > timeoutMax {
+		wt = timeoutMax
 	}
 
 	subCtx, cancel := context.WithTimeout(ctx.Context(), wt)

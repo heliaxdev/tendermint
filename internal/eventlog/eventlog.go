@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/tendermint/tendermint/internal/eventlog/cursor"
-	"github.com/tendermint/tendermint/types"
+	tmevents "github.com/tendermint/tendermint/libs/events"
 )
 
 // A Log is a reverse time-ordered log of events in a sliding window of time
@@ -57,7 +57,7 @@ func New(opts LogSettings) (*Log, error) {
 //
 // Any error reported by Add arises from pruning; the new item was added to the
 // log regardless whether an error occurs.
-func (lg *Log) Add(etype string, data types.EventData) error {
+func (lg *Log) Add(etype string, data tmevents.EventData) error {
 	lg.mu.Lock()
 	head := &logEntry{
 		item: newItem(lg.source.Cursor(), etype, data),
@@ -125,9 +125,6 @@ type LogSettings struct {
 
 	// The cursor source to use for log entries. If not set, use wallclock time.
 	Source cursor.Source
-
-	// If non-nil, exported metrics to update. If nil, metrics are discarded.
-	Metrics *Metrics
 }
 
 // Info records the current state of the log at the time of a scan operation.

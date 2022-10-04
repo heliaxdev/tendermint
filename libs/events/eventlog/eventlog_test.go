@@ -13,8 +13,8 @@ import (
 	"github.com/fortytw2/leaktest"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/tendermint/tendermint/internal/eventlog"
-	"github.com/tendermint/tendermint/internal/eventlog/cursor"
+	"github.com/tendermint/tendermint/libs/events/eventlog"
+	"github.com/tendermint/tendermint/libs/events/eventlog/cursor"
 	"github.com/tendermint/tendermint/types"
 )
 

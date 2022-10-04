@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/internal/eventlog/cursor"
 	tmevents "github.com/tendermint/tendermint/libs/events"
+	"github.com/tendermint/tendermint/libs/events/eventlog/cursor"
 	"github.com/tendermint/tendermint/types"
 )
 

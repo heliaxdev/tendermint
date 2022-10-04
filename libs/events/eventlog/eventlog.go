@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tendermint/tendermint/internal/eventlog/cursor"
 	tmevents "github.com/tendermint/tendermint/libs/events"
+	"github.com/tendermint/tendermint/libs/events/eventlog/cursor"
 )
 
 // A Log is a reverse time-ordered log of events in a sliding window of time

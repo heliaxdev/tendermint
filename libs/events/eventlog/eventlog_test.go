@@ -32,8 +32,6 @@ func (f *fakeTime) advance(d time.Duration) { f.now += int64(d) }
 // eventData is a placeholder event data implementation for testing.
 type eventData string
 
-func (eventData) TypeTag() string { return "eventData" }
-
 func TestNewError(t *testing.T) {
 	lg, err := eventlog.New(eventlog.LogSettings{})
 	if err == nil {
@@ -118,7 +116,7 @@ func TestConcurrent(t *testing.T) {
 			case <-ctx.Done():
 				return
 			case t := <-tick.C:
-				_ = lg.Add("test-event", eventData(t.Format(time.RFC3339Nano)))
+				_ = lg.Add(eventData(t.Format(time.RFC3339Nano)), tmevents.Events{})
 				tick.Reset(time.Duration(rand.Intn(50)) * time.Millisecond)
 			}
 		}
@@ -192,7 +190,7 @@ func TestPruneSize(t *testing.T) {
 // pruning, the test fails; otherwise the error is returned.
 func mustAdd(t *testing.T, lg *eventlog.Log, etype string, data tmevents.EventData) {
 	t.Helper()
-	err := lg.Add(etype, data)
+	err := lg.Add(data, tmevents.Events{})
 	if err != nil && !errors.Is(err, eventlog.ErrLogPruned) {
 		t.Fatalf("Add %q failed: %v", etype, err)
 	}

@@ -57,7 +57,10 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 	var event *ctypes.ResultEvent
 
 	accept := func(itm *eventlog.Item) error {
-		matches, _ := q.Matches(itm.Events)
+		matches, err := q.Matches(itm.Events)
+		if err != nil {
+			return err
+		}
 		if cursorInRange(itm.Cursor, before, after) && matches {
 			event = &ctypes.ResultEvent{
 				Query:  query,

@@ -22,6 +22,9 @@ func (e ErrListenerWasRemoved) Error() string {
 // tendermint/go-amino via concrete implementation of this interface.
 type EventData interface{}
 
+// Events is a mapping between event types and lists of events.
+type Events map[string][]string
+
 // Eventable is the interface reactors and other modules must export to become
 // eventable.
 type Eventable interface {

@@ -22,9 +22,11 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/evidence"
 
+	"github.com/tendermint/tendermint/libs/events/eventlog"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmpubsub "github.com/tendermint/tendermint/libs/pubsub"
+	tmquery "github.com/tendermint/tendermint/libs/pubsub/query"
 	"github.com/tendermint/tendermint/libs/service"
 	"github.com/tendermint/tendermint/light"
 	mempl "github.com/tendermint/tendermint/mempool"
@@ -207,6 +209,9 @@ type Node struct {
 	nodeInfo    p2p.NodeInfo
 	nodeKey     *p2p.NodeKey // our node privkey
 	isListening bool
+
+	// log of abci events
+	eventLog *eventlog.Log
 
 	// services
 	eventBus          *types.EventBus // pub/sub for services
@@ -741,6 +746,39 @@ func NewNode(config *cfg.Config,
 		return nil, err
 	}
 
+	// Start the event logger.
+	eventLog, err := eventlog.New(eventlog.LogSettings{
+		// TODO: add config params for these fields
+		WindowSize: 3 * time.Minute,
+		MaxItems:   5000,
+	})
+	if err != nil {
+		return nil, err
+	}
+	sub, err := eventBus.SubscribeUnbuffered(
+		context.Background(),
+		"EventLog",
+		tmquery.Empty{},
+	)
+	if err != nil {
+		return nil, err
+	}
+	go func(logger log.Logger) {
+		// defer eventBus.UnsubscribeAll()
+		for {
+			select {
+			case msg := <-sub.Out():
+				err := eventLog.Add(msg.Data(), msg.Events())
+				if err != nil {
+					logger.Error("Failed to add event to the log", "err", err)
+				}
+			case <-sub.Cancelled():
+				logger.Error("Event bus subscription was canceled", "err", sub.Err())
+				return
+			}
+		}
+	}(logger.With("module", "eventlog"))
+
 	indexerService, txIndexer, blockIndexer, err := createAndStartIndexerService(config,
 		genDoc.ChainID, dbProvider, eventBus, logger)
 	if err != nil {
@@ -923,6 +961,7 @@ func NewNode(config *cfg.Config,
 		indexerService:   indexerService,
 		blockIndexer:     blockIndexer,
 		eventBus:         eventBus,
+		eventLog:         eventLog,
 	}
 	node.BaseService = *service.NewBaseService(logger, "Node", node)
 
@@ -1079,6 +1118,7 @@ func (n *Node) ConfigureRPC() error {
 		BlockIndexer:     n.blockIndexer,
 		ConsensusReactor: n.consensusReactor,
 		EventBus:         n.eventBus,
+		EventLog:         n.eventLog,
 		Mempool:          n.mempool,
 
 		Logger: n.Logger.With("module", "rpc"),

@@ -765,7 +765,12 @@ func NewNode(config *cfg.Config,
 		return nil, err
 	}
 	go func(logger log.Logger) {
-		defer eventBus.UnsubscribeAll(context.Background(), "EventLog")
+		defer func() {
+			err := eventBus.UnsubscribeAll(context.Background(), "EventLog")
+			if err != nil {
+				logger.Error("Failed to unsubscribe from events", "err", err)
+			}
+		}()
 		for {
 			select {
 			case msg := <-sub.Out():

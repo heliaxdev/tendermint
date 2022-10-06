@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/tendermint/tendermint/libs/events/eventlog"
+	"github.com/tendermint/tendermint/libs/events/eventlog/cursor"
 	tmpubsub "github.com/tendermint/tendermint/libs/pubsub"
 	tmquery "github.com/tendermint/tendermint/libs/pubsub/query"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -26,10 +28,18 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 		return nil, err
 	}
 
-	q, err := tmquery.New(query)
-	if err != nil {
-		err = fmt.Errorf("failed to parse query: %w", err)
-		return nil, err
+	var q interface {
+		Matches(events map[string][]string) (bool, error)
+	}
+	if query == "" {
+		q = tmquery.Empty{}
+	} else {
+		parsed, err := tmquery.New(query)
+		if err != nil {
+			err = fmt.Errorf("failed to parse query: %w", err)
+			return nil, err
+		}
+		q = parsed
 	}
 
 	const timeoutMin = 1 * time.Second
@@ -40,35 +50,57 @@ func Events(ctx *rpctypes.Context, query, maxWaitTime string) (*ctypes.ResultEve
 		wt = timeoutMax
 	}
 
-	subCtx, cancel := context.WithTimeout(ctx.Context(), wt)
-	defer cancel()
+	// Use zero value cursors for now, to fetch the latest events.
+	var before, after cursor.Cursor
 
-	addr := ctx.RemoteAddr()
-	sub, err := env.EventBus.Subscribe(subCtx, addr, q, env.Config.SubscriptionBufferSize)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		// unsubscribing shouldn't take too long. `maxWaitTime` is not a precise
-		// timeout anyway...
-		_ = env.EventBus.Unsubscribe(context.Background(), addr, q)
-	}()
+	var info eventlog.Info
+	var event *ctypes.ResultEvent
 
-	select {
-	case msg := <-sub.Out():
-		event := &ctypes.ResultEvent{
-			Query:  query,
-			Data:   msg.Data(),
-			Events: msg.Events(),
+	accept := func(itm *eventlog.Item) error {
+		matches, _ := q.Matches(itm.Events)
+		if cursorInRange(itm.Cursor, before, after) && matches {
+			event = &ctypes.ResultEvent{
+				Query:  query,
+				Data:   itm.Data,
+				Events: itm.Events,
+			}
+			return eventlog.ErrStopScan
 		}
-		return event, nil
-	case <-subCtx.Done():
-		err = fmt.Errorf("timeout of %s expired", wt)
-		return nil, err
-	case <-sub.Cancelled():
-		err = fmt.Errorf("subscription was canceled, reason: %w", sub.Err())
+		return nil
+	}
+
+	if wt > 0 && before.IsZero() {
+		subCtx, cancel := context.WithTimeout(ctx.Context(), wt)
+		defer cancel()
+
+		// Long poll. The loop here is because new items may not match the query,
+		// and we want to keep waiting until we have relevant results (or time out).
+		cur := after
+		for event == nil {
+			info, err = env.EventLog.WaitScan(subCtx, cur, accept)
+			if err != nil {
+				// Don't report a timeout as a request failure.
+				if errors.Is(err, context.DeadlineExceeded) {
+					err = nil
+				}
+				break
+			}
+			cur = info.Newest
+		}
+	} else {
+		// Quick poll, return only what is already available.
+		info, err = env.EventLog.Scan(accept)
+	}
+
+	if err != nil {
+		err = fmt.Errorf("found error while scanning events: %w", err)
 		return nil, err
 	}
+	return event, nil
+}
+
+func cursorInRange(c, before, after cursor.Cursor) bool {
+	return (before.IsZero() || c.Before(before)) && (after.IsZero() || after.Before(c))
 }
 
 // Subscribe for events via WebSocket.

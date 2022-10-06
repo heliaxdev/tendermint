@@ -755,10 +755,11 @@ func NewNode(config *cfg.Config,
 	if err != nil {
 		return nil, err
 	}
+	query, _ := tmquery.New("tm.event='NewBlock'")
 	sub, err := eventBus.SubscribeUnbuffered(
 		context.Background(),
 		"EventLog",
-		tmquery.Empty{},
+		query,
 	)
 	if err != nil {
 		return nil, err

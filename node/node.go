@@ -764,7 +764,7 @@ func NewNode(config *cfg.Config,
 		return nil, err
 	}
 	go func(logger log.Logger) {
-		// defer eventBus.UnsubscribeAll()
+		defer eventBus.UnsubscribeAll(context.Background(), "EventLog")
 		for {
 			select {
 			case msg := <-sub.Out():

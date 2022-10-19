@@ -354,8 +354,23 @@ func execBlockOnProxyApp(
 
 	commitInfo := buildLastCommitInfo(block, store, initialHeight)
 
-	// Begin block
 	var err error
+	_, err = proxyAppConn.ProcessProposalSync(abci.RequestProcessProposal{
+		Hash:               block.Header.Hash(),
+		Height:             block.Header.Height,
+		Time:               block.Header.Time,
+		Txs:                block.Data.Txs.ToSliceOfBytes(),
+		ProposedLastCommit: commitInfo,
+		Misbehavior:        block.Evidence.Evidence.ToABCI(),
+		ProposerAddress:    block.ProposerAddress,
+		NextValidatorsHash: block.NextValidatorsHash,
+	})
+	if err != nil {
+		logger.Error("error in proxyAppConn.ProcessProposal", "err", err)
+		return nil, err
+	}
+
+	// Begin block
 	pbh := block.Header.ToProto()
 	if pbh == nil {
 		return nil, errors.New("nil header")

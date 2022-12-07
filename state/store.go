@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	dbm "github.com/tendermint/tm-db"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -531,7 +531,7 @@ func loadValidatorsInfo(db dbm.DB, height int64) (*tmstate.ValidatorsInfo, error
 	}
 
 	if len(buf) == 0 {
-		return nil, errors.New("no last ABCI response has been persisted")
+		return nil, errors.New("value retrieved from db is empty")
 	}
 
 	v := new(tmstate.ValidatorsInfo)
@@ -619,7 +619,7 @@ func (store dbStore) loadConsensusParamsInfo(height int64) (*tmstate.ConsensusPa
 		return nil, err
 	}
 	if len(buf) == 0 {
-		return nil, errors.New("no last ABCI response has been persisted")
+		return nil, errors.New("value retrieved from db is empty")
 	}
 
 	paramsInfo := new(tmstate.ConsensusParamsInfo)

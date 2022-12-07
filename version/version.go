@@ -7,9 +7,9 @@ var (
 const (
 	// TMVersionDefault is the used as the fallback version of Tendermint Core
 	// when not using git describe. It is formatted with semantic versioning.
-	TMVersionDefault = "0.1.4-abciplus"
-	// ABCISemVer is the semantic version of the ABCI library
-	ABCISemVer = "0.18.0"
+	TMVersionDefault = "0.37.0-alpha.1+heliaxdev"
+	// ABCISemVer is the semantic version of the ABCI protocol
+	ABCISemVer = "1.0.0"
 
 	ABCIVersion = ABCISemVer
 )

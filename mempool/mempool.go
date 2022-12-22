@@ -144,6 +144,8 @@ func PostCheckMaxGas(maxGas int64) PostCheckFunc {
 	}
 }
 
+var ErrTxFromOutside = errors.New("tx comes from outside")
+
 // ErrTxInCache is returned to the client if we saw tx earlier
 var ErrTxInCache = errors.New("tx already exists in cache")
 

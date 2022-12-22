@@ -216,6 +216,10 @@ func (mem *CListMempool) CheckTx(
 		return err
 	}
 
+	if txInfo.SenderID != 0 {
+		return mempool.ErrTxFromOutside
+	}
+
 	if txSize > mem.config.MaxTxBytes {
 		return mempool.ErrTxTooLarge{
 			Max:    mem.config.MaxTxBytes,

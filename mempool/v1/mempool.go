@@ -183,6 +183,10 @@ func (txmp *TxMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo memp
 		txmp.mtx.RLock()
 		defer txmp.mtx.RUnlock()
 
+		if txInfo.SenderID != 0 {
+			return 0, mempool.ErrTxFromOutside
+		}
+
 		// Reject transactions in excess of the configured maximum transaction size.
 		if len(tx) > txmp.config.MaxTxBytes {
 			return 0, mempool.ErrTxTooLarge{Max: txmp.config.MaxTxBytes, Actual: len(tx)}

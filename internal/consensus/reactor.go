@@ -832,6 +832,11 @@ func (r *Reactor) queryMaj23Routine(ctx context.Context, ps *PeerState, stateCh 
 		rs := r.getRoundState()
 		prs := ps.GetRoundState()
 
+		if rs.Votes == nil {
+			r.logger.Debug("rs.Votes has not yet been initialized, will retry queryMaj23Routine")
+			continue
+		}
+
 		wg := &sync.WaitGroup{}
 
 		if rs.Height == prs.Height {
